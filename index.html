@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UKRWORLD Courier Tracking</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="firebase.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>UKRWORLD Courier Tracking</h1>
+        <p>Enter your tracking ID to check your package status:</p>
+
+        <input type="text" id="trackingIdInput" placeholder="Enter tracking ID">
+        <button onclick="checkStatus()">Check Status</button>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        async function checkStatus() {
+            const trackingId = document.getElementById('trackingIdInput').value.trim();
+            const resultDiv = document.getElementById('result');
+
+            if (!trackingId) {
+                resultDiv.innerHTML = "<p style='color:red;'>Please enter a tracking ID</p>";
+                return;
+            }
+
+            try {
+                const docRef = db.collection('packages').doc(trackingId);
+                const doc = await docRef.get();
+
+                if (!doc.exists) {
+                    resultDiv.innerHTML = "<p style='color:red;'>Tracking ID not found</p>";
+                } else {
+                    const data = doc.data();
+                    resultDiv.innerHTML = `
+                        <h3>Package Status</h3>
+                        <p><b>Recipient:</b> ${data.recipient}</p>
+                        <p><b>Phone:</b> ${data.phone}</p>
+                        <p><b>Service:</b> ${data.service}</p>
+                        <p><b>Status:</b> ${data.status}</p>
+                    `;
+                }
+            } catch (error) {
+                console.error(error);
+                resultDiv.innerHTML = "<p style='color:red;'>Error fetching status</p>";
+            }
+        }
+    </script>
+</body>
+</html>
