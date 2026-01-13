@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>UKRWORLD Package Tracking</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase.js"></script>
+</head>
+<body>
+  <h2>Track Your Package - UKRWORLD COURIER EXPRESS</h2>
+
+  <input type="text" id="trackingInput" placeholder="Enter Tracking ID">
+  <button onclick="trackPackage()">Check Status</button>
+
+  <div id="status"></div>
+
+  <script>
+    async function trackPackage() {
+      const id = document.getElementById('trackingInput').value.trim();
+      if(!id) return alert('Enter tracking ID');
+
+      const docRef = db.collection('packages').doc(id);
+      const docSnap = await docRef.get();
+      const statusDiv = document.getElementById('status');
+
+      if(docSnap.exists){
+        const data = docSnap.data();
+        statusDiv.innerHTML = `
+          <p>Recipient: ${data.recipient}</p>
+          <p>Phone: ${data.phone}</p>
+          <p>Service: ${data.service}</p>
+          <p>Status: <b>${data.status}</b></p>
+        `;
+      } else {
+        statusDiv.innerHTML = `<p>Tracking ID not found</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
